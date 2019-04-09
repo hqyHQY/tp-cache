@@ -58,6 +58,67 @@ public class TpRedisCache implements RedisCache{
     }
 
     /**
+     * 设置key的过期时间
+     * @param key
+     * @param expire
+     */
+    public void expire(String key,int expire){
+        JedisPool jedisPool = getJedisPool();
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            jedis.expire(key,expire);
+        }catch (Exception e){
+            logger.error("TpRedisCache method error ,method:{},key:{}","expire",key);
+            e.printStackTrace();
+        }finally {
+            if (jedis != null)
+                jedis.close();
+        }
+    }
+
+    /**
+     * 获取key的过期时间
+     * @param key
+     * @return
+     */
+    public Long ttl(String key){
+        JedisPool jedisPool = getJedisPool();
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            return jedis.ttl(key);
+        }catch (Exception e){
+            logger.error("TpRedisCache method error ,method:{},key:{}","ttl",key);
+            e.printStackTrace();
+        }finally {
+            if (jedis != null)
+                jedis.close();
+        }
+        return null;
+    }
+
+    /**
+     * 移除key的生存时间限制
+     * @param key
+     */
+    public void persist(String key){
+        JedisPool jedisPool = getJedisPool();
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            jedis.persist(key);
+        }catch (Exception e){
+            logger.error("TpRedisCache method error ,method:{},key:{}","persist",key);
+            e.printStackTrace();
+        }finally {
+            if (jedis != null)
+                jedis.close();
+        }
+    }
+
+
+    /**
      * 删除对应的key
      * @param key
      */
@@ -66,7 +127,7 @@ public class TpRedisCache implements RedisCache{
         Jedis jedis = null;
         try{
             jedis = jedisPool.getResource();
-           jedis.del(key);
+            jedis.del(key);
         }catch (Exception e){
             logger.error("TpRedisCache method error ,method:{},key:{}","del",key);
             e.printStackTrace();
@@ -76,7 +137,24 @@ public class TpRedisCache implements RedisCache{
         }
     }
 
-
+    /**
+     * 批量删除对应的key
+     * @param keys
+     */
+    public void del(String[] keys){
+        JedisPool jedisPool = getJedisPool();
+        Jedis jedis = null;
+        try{
+            jedis = jedisPool.getResource();
+            jedis.del(keys);
+        }catch (Exception e){
+            logger.error("TpRedisCache method error ,method:{},key:{}","del[]",keys);
+            e.printStackTrace();
+        }finally {
+            if (jedis != null)
+                jedis.close();
+        }
+    }
 
 
     /////////////字符串相关
@@ -171,7 +249,7 @@ public class TpRedisCache implements RedisCache{
      *
      * @param key
      * @param value
-     * @param expire 过期时间，单位：毫秒
+     * @param expire 过期时间，单位：秒
      */
     public void setex(String key,Object value,int expire){
         JedisPool jedisPool = getJedisPool();
