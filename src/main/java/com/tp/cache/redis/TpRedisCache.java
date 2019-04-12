@@ -1,10 +1,11 @@
 package com.tp.cache.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.tp.factory.JedisPoolFactory;
+import com.tp.factory.SingleJedisPoolFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
@@ -15,15 +16,16 @@ import java.util.ArrayList;
 /**
  * @Auther: hequnayu
  * @Date: 2019/4/3 18:53
- * @Description:
+ * @Description: 默认提供jedis客户端实现
  */
+@Primary
 @Service
 public class TpRedisCache implements RedisCache{
 
     private Logger logger = LoggerFactory.getLogger(TpRedisCache.class);
 
     @Autowired
-    private JedisPoolFactory poolFactory;
+    private SingleJedisPoolFactory poolFactory;
 
     public JedisPool getJedisPool(){
         JedisPool jedisPool = poolFactory.bulid();
@@ -33,8 +35,6 @@ public class TpRedisCache implements RedisCache{
         }
         return jedisPool;
     }
-
-    /////////////键操作
 
     /**
      * 判断key是否存在
@@ -51,8 +51,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","exists",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
         return false;
     }
@@ -72,8 +71,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","expire",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
@@ -92,8 +90,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","ttl",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
         return null;
     }
@@ -112,8 +109,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","persist",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
@@ -132,8 +128,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","del",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
@@ -151,13 +146,10 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","del[]",keys);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
-
-    /////////////字符串相关
     /**
      * 获取key的string值
      * @param key
@@ -174,8 +166,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","get",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
         return null;
     }
@@ -199,8 +190,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","get",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
         return result;
     }
@@ -220,8 +210,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","set",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
@@ -240,8 +229,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","setnx",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
@@ -261,8 +249,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","setex",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
@@ -281,8 +268,7 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","append",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+            close(jedis);
         }
     }
 
@@ -303,11 +289,12 @@ public class TpRedisCache implements RedisCache{
             logger.error("TpRedisCache method error ,method:{},key:{}","getrange",key);
             e.printStackTrace();
         }finally {
-            if (jedis != null)
-                jedis.close();
+           close(jedis);
         }
         return null;
     }
+
+
 
 
     /**
@@ -353,14 +340,14 @@ public class TpRedisCache implements RedisCache{
         }
     }
 
-    public static void main(String[] args) {
-        TpRedisCache tp = new TpRedisCache();
-        String x = "1sss";
-        ArrayList arrayList = new ArrayList();
-        arrayList.add(1);
-        arrayList.add("sssss");
-        System.out.println(JSON.toJSONString(x));
-        System.out.println(tp.conversionToObject(JSON.toJSONString(1), int.class));
+    /**
+     * 关闭jedis
+     * @param jedis
+     */
+    public void close(Jedis jedis){
+        if(jedis != null){
+            jedis.close();
+        }
     }
 
 }

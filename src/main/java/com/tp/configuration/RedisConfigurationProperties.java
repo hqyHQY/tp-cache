@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * @Auther: hequnayu
- * @Date: 2019/4/3 18:56
- * @Description: jedis可配置参数
+ * @Date: 2019/4/12 16:23
+ * @Description: redis 公共配置
  */
 @Data
 @Component
@@ -15,19 +15,19 @@ import org.springframework.stereotype.Component;
 public class RedisConfigurationProperties {
 
     /**
-     * 主机地址
+     * redis模式：单节点(默认)、主从、集群
      */
-    private String host;
-
-    /**
-     * 主机端口
-     */
-    private int port;
+    private String model = "single";
 
     /**
      * 连接超时时间
      */
     private int connectTimeout = 10000;
+
+    /**
+     * 获取数据超时时间
+     */
+    private int soTimeout = 10000;
 
     /**
      * Redis访问用户名
@@ -63,6 +63,5 @@ public class RedisConfigurationProperties {
      * pool中无可用jedis时是否阻塞
      */
     private boolean blockWhenExhausted = true;
-
 
 }

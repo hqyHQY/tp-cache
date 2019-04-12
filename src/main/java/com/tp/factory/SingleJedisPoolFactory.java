@@ -1,6 +1,7 @@
 package com.tp.factory;
 
 import com.tp.configuration.RedisConfigurationProperties;
+import com.tp.configuration.RedisSingleConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -10,13 +11,13 @@ import redis.clients.jedis.JedisPoolConfig;
 /**
  * @Auther: hequnayu
  * @Date: 2019/4/9 11:29
- * @Description:
+ * @Description: 单节点构建
  */
 @Component
-public class JedisPoolFactory {
+public class SingleJedisPoolFactory {
 
     @Autowired
-    RedisConfigurationProperties redisConfigurationProperties;
+    RedisSingleConfigurationProperties redisConfigurationProperties;
 
     /**
      * 构建jedispool实例
